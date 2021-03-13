@@ -41,14 +41,16 @@ los mismos.
 # Construccion de modelos
 def crearDicCategoryId ():
     categoryId = mp.newMap(16,
-                                 maptype='CHAINING',
-                                 loadfactor=2.0)
-    categoryfile = cf.data_dir + 'videos/category-id.csv'
+                           maptype='CHAINING',
+                           loadfactor=2.0)
+    categoryfile = cf.data_dir + 'video-samples/samples/category-id.csv'
     input_file = csv.DictReader(open(categoryfile, encoding='utf-8'))
     
     for category in input_file:
         lista = category["id\tname"].split()
-        mp.put (categoryId, int (lista [0]), " ".join(lista[1:len(lista)])
+        mp.put (categoryId, int (lista [0]), " ".join(lista[1:len(lista)]))
+
+    return categoryId
 
 def newCatalog ():
     """ Inicializa el catálogo de libros
@@ -68,7 +70,7 @@ def newCatalog ():
                'trending_date': None,
                'title': None,
                'channel_title': None,
-               'category_id': None,
+               'category': None,
                'publish_time': None,
                'tags': None,
                'views': None,
@@ -81,7 +83,7 @@ def newCatalog ():
     ordenados por ningun criterio.  Son referenciados
     por los indices creados a continuacion.
     """
-    catalog['videos'] = lt.newList('SINGLE_LINKED')
+    catalog['videos'] = lt.newList(datastructure='SINGLE_LINKED')
 
     """
     A continuacion se crean indices por diferentes criterios
@@ -101,7 +103,7 @@ def newCatalog ():
                                    maptype='CHAINING',
                                    loadfactor=4.0)
 
-    catalog['category_id'] = mp.newMap(16,
+    catalog['category'] = mp.newMap(16,
                                  maptype='CHAINING',
                                  loadfactor=2.0)
 
@@ -123,27 +125,111 @@ def newCatalog ():
 
     return catalog
 # Funciones para agregar informacion al catalogo
-def addVideo (catalog, video):
-    lt.addLast(catalog["videos", video])
+def addVideo (catalog, DicCategoryId, video):
+    lt.addLast(catalog["videos"], video)
+    addCategory(catalog, DicCategoryId, video)
+    addCountry(catalog, video)
+    addLikes(catalog, video)
+    addTags(catalog, video)
+    addTrendingDate(catalog, video)
+    addViews(catalog, video)
 
 def addTrendingDate (catalog, video):
     dic = catalog["trending_date"]
     presencia = mp.contains(dic, video["trending_date"])
     if presencia:
         entry = mp.get(dic, video["trending_date"])
-        lista = me.getValue(enrty)
+        lista = me.getValue(entry)
         lt.addLast(lista, video) 
     else:
         mp.put(dic, video["trending_date"], lt.newList(datastructure="SINGLE_LINKED"))
         entry = mp.get(dic, video["trending_date"])
-        lista = me.getValue(enrty)
+        lista = me.getValue(entry)
         lt.addLast(lista, video)
 
-def addCategoryId ()
+def addCategory (catalog, dic, video):
+    mapa = catalog["category"]
+    entry = mp.get(dic, int (video["category_id"]))
+    categoria = me.getValue(entry)
     
+    presencia = mp.contains(mapa, categoria)
+    if presencia:
+        entry = mp.get(mapa, categoria)
+        lista = me.getValue(entry)
+        lt.addLast(lista, video) 
+    else:
+        mp.put(mapa, categoria, lt.newList(datastructure="SINGLE_LINKED"))
+        entry = mp.get(mapa, categoria)
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)
+
+def addTags (catalog, video):
+    dic = catalog["tags"]
+    lista = video["tags"].split("|")
+
+    for tag in lista:
+        presencia = mp.contains(dic, tag)
+
+        if presencia:
+            entry = mp.get(dic, tag)
+            lista = me.getValue(entry)
+            lt.addLast(lista, video)   
+        else:
+            mp.put(dic, tag, lt.newList(datastructure="SINGLE_LINKED"))
+            entry = mp.get(dic, tag)
+            lista = me.getValue(entry)
+            lt.addLast(lista, video)
+
+def addViews (catalog, video):
+    dic = catalog["views"]
+    presencia = mp.contains(dic, int (video["views"]))
+
+    if presencia:
+        entry = mp.get(dic, int (video["views"]))
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)  
+    else:
+        mp.put(dic, int (video["views"]), lt.newList(datastructure="SINGLE_LINKED"))
+        entry = mp.get(dic, int (video["views"]))
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)
+
+def addLikes (catalog, video):
+    dic = catalog["likes"]
+    presencia = mp.contains(dic, int (video["likes"]))
+
+    if presencia:
+        entry = mp.get(dic, int (video["likes"]))
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)  
+    else:
+        mp.put(dic, int (video["likes"]), lt.newList(datastructure="SINGLE_LINKED"))
+        entry = mp.get(dic, int (video["likes"]))
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)
+
+def addCountry (catalog, video):
+    dic = catalog["country"]
+    presencia = mp.contains(dic, video["country"])
+
+    if presencia:
+        entry = mp.get(dic, video["country"])
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)  
+    else:
+        mp.put(dic, video["country"], lt.newList(datastructure="SINGLE_LINKED"))
+        entry = mp.get(dic, video["country"])
+        lista = me.getValue(entry)
+        lt.addLast(lista, video)
+
 # Funciones para creacion de datos
 
 # Funciones de consulta
+def reqLab (catalog):
+    mapa = catalog["likes"]
+    llaves = mp.keySet(mapa)
+
+
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 

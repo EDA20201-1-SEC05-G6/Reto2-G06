@@ -25,7 +25,7 @@ import sys
 import controller
 from DISClib.ADT import list as lt
 assert cf
-
+from DISClib.ADT import map as mp
 
 """
 La vista se encarga de la interacción con el usuario
@@ -37,7 +37,15 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- ")
+    print("2- Buscar los n videos con más likes para el nombre de una categoría específica")
+
+def initCatalog():
+
+    return controller.initCatalog()
+
+def loadData(catalog):
+
+    controller.loadData(catalog)
 
 catalog = None
 
@@ -49,9 +57,11 @@ while True:
     inputs = input('Seleccione una opción para continuar\n')
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
-
+        catalog = initCatalog()
+        loadData(catalog)
+        print(mp.keySet(catalog["category"]))
     elif int(inputs[0]) == 2:
-        pass
+         pass
 
     else:
         sys.exit(0)
