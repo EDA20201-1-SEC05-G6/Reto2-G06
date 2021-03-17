@@ -26,7 +26,6 @@ import controller
 from DISClib.ADT import list as lt
 assert cf
 from DISClib.ADT import map as mp
-
 """
 La vista se encarga de la interacción con el usuario
 Presenta el menu de opciones y por cada seleccion
@@ -47,6 +46,10 @@ def loadData(catalog):
 
     controller.loadData(catalog)
 
+def reqLab(catalog, categoría, num):
+
+    return controller.reqLab(catalog, categoría, num)
+
 catalog = None
 
 """
@@ -59,9 +62,21 @@ while True:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
         loadData(catalog)
-        print(mp.keySet(catalog["category"]))
+
     elif int(inputs[0]) == 2:
-         pass
+        categoria= input("Ingrese la categoría que desea consultar-> ")  
+        num = int(input("Ingrese el numero de videos que desea consultar-> "))
+        videos = reqLab(catalog, categoria, num)
+        n= 1
+        for video in lt.iterator(videos):
+            print("\nVideo " + str(n))
+            print(video["title"])
+            print("Country: " + video["country"])
+            print("Views: " + video["views"])
+            print("Likes: " + video["likes"])
+
+            n+= 1
+            
 
     else:
         sys.exit(0)

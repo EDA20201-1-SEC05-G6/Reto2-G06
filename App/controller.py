@@ -34,20 +34,18 @@ def initCatalog():
 
     return model.newCatalog()
 
-def crearDicCategoryId ():
-
-    return model.crearDicCategoryId()
 # Funciones para la carga de datos
 def loadData(catalog):
-    
-    DicCategoryId = crearDicCategoryId()
-    loadVideos(catalog, DicCategoryId)
+    loadVideos(catalog)
 
-def loadVideos(catalog, DicCategoryId):
-    videosfile = cf.data_dir + 'video-samples/samples/videos-small.csv'
+def loadVideos(catalog):
+    videosfile = cf.data_dir + 'video-samples/samples/videos-large.csv'
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
     for video in input_file:
-        model.addVideo(catalog, DicCategoryId, video)
+        model.addVideo(catalog, video)
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
+def reqLab(catalog, categoría, num):
+
+   return model.reqLab(catalog, categoría, num)

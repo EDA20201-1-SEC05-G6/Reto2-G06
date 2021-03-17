@@ -32,6 +32,11 @@ from DISClib.ADT import map as mp
 from DISClib.DataStructures import mapentry as me
 from DISClib.Algorithms.Sorting import shellsort as sa
 assert cf
+from DISClib.Algorithms.Sorting import shellsort as sha
+from DISClib.Algorithms.Sorting import insertionsort as ia
+from DISClib.Algorithms.Sorting import selectionsort as sa
+from DISClib.Algorithms.Sorting import quicksort as qk
+from DISClib.Algorithms.Sorting import mergesort as mg
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -39,18 +44,6 @@ los mismos.
 """
 
 # Construccion de modelos
-def crearDicCategoryId ():
-    categoryId = mp.newMap(16,
-                           maptype='CHAINING',
-                           loadfactor=2.0)
-    categoryfile = cf.data_dir + 'video-samples/samples/category-id.csv'
-    input_file = csv.DictReader(open(categoryfile, encoding='utf-8'))
-    
-    for category in input_file:
-        lista = category["id\tname"].split()
-        mp.put (categoryId, int (lista [0]), " ".join(lista[1:len(lista)]))
-
-    return categoryId
 
 def newCatalog ():
     """ Inicializa el catálogo de libros
@@ -70,12 +63,13 @@ def newCatalog ():
                'trending_date': None,
                'title': None,
                'channel_title': None,
-               'category': None,
+               'category_id': None,
                'publish_time': None,
                'tags': None,
                'views': None,
                'likes': None,
-               'country': None}
+               'country': None,
+               "categories": None}
 
     """
     Esta lista contiene todo los libros encontrados
@@ -103,7 +97,7 @@ def newCatalog ():
                                    maptype='CHAINING',
                                    loadfactor=4.0)
 
-    catalog['category'] = mp.newMap(16,
+    catalog['category_id'] = mp.newMap(16,
                                  maptype='CHAINING',
                                  loadfactor=2.0)
 
@@ -122,17 +116,34 @@ def newCatalog ():
     catalog['country'] = mp.newMap(50,
                                  maptype='CHAINING',
                                  loadfactor=4.0)
+    catalog['categories'] = mp.newMap(32, 
+                                 maptype='PROBING',
+                                 loadfactor=0.5)
 
     return catalog
 # Funciones para agregar informacion al catalogo
-def addVideo (catalog, DicCategoryId, video):
+def addVideo (catalog, video):
     lt.addLast(catalog["videos"], video)
-    addCategory(catalog, DicCategoryId, video)
+    addCategoryID(catalog, video)
     addCountry(catalog, video)
     addLikes(catalog, video)
     addTags(catalog, video)
     addTrendingDate(catalog, video)
     addViews(catalog, video)
+    crearDicCategoryId(catalog)
+
+def crearDicCategoryId (catalog):
+    dic = catalog["categories"]
+    categoryfile = cf.data_dir + 'video-samples/samples/category-id.csv'
+    input_file = csv.DictReader(open(categoryfile, encoding='utf-8'))
+
+    for category in input_file:
+        lista = category["id\tname"].split()
+        llave = " ".join(lista[1:len(lista)])
+        presencia = mp.contains(dic, llave)
+        if not presencia: 
+            mp.put(dic, llave, int(lista [0]))
+
 
 def addTrendingDate (catalog, video):
     dic = catalog["trending_date"]
@@ -147,19 +158,16 @@ def addTrendingDate (catalog, video):
         lista = me.getValue(entry)
         lt.addLast(lista, video)
 
-def addCategory (catalog, dic, video):
-    mapa = catalog["category"]
-    entry = mp.get(dic, int (video["category_id"]))
-    categoria = me.getValue(entry)
-    
-    presencia = mp.contains(mapa, categoria)
+def addCategoryID(catalog, video):
+    dic = catalog["category_id"]
+    presencia = mp.contains(dic, video["category_id"])
     if presencia:
-        entry = mp.get(mapa, categoria)
+        entry = mp.get(dic, video["category_id"])
         lista = me.getValue(entry)
         lt.addLast(lista, video) 
     else:
-        mp.put(mapa, categoria, lt.newList(datastructure="SINGLE_LINKED"))
-        entry = mp.get(mapa, categoria)
+        mp.put(dic, video["category_id"], lt.newList(datastructure="SINGLE_LINKED"))
+        entry = mp.get(dic, video["category_id"])
         lista = me.getValue(entry)
         lt.addLast(lista, video)
 
@@ -225,12 +233,70 @@ def addCountry (catalog, video):
 # Funciones para creacion de datos
 
 # Funciones de consulta
-def reqLab (catalog):
-    mapa = catalog["likes"]
-    llaves = mp.keySet(mapa)
+def reqLab (catalog, categoría, num):
+    videoLikes = catalog["likes"]
+    categorias = catalog["categories"]
+    entry = mp.get(categorias, categoría)
+    categoryid = me.getValue(entry)
+    llaves = mp.keySet(videoLikes)
+    lista = lt.newList(datastructure="ARRAY_LIST")
+    
+    for llave in lt.iterator(llaves):
+        lt.addLast(lista, llave)
 
+    quickSort(lista, cmpVideosByLikes)
+    videos = lt.newList(datastructure="ARRAY_LIST")
+    n = 0
+
+    for llave in lt.iterator(lista):
+
+        entry = mp.get(videoLikes, llave)
+        elemento = me.getValue(entry)
+
+        for video in lt.iterator(elemento):
+            if int(video["category_id"]) == categoryid:
+
+                lt.addLast(videos, video)
+                n+= 1
+
+            if n >= num: 
+                return videos
+
+    
+             
+
+        
 
 
 # Funciones utilizadas para comparar elementos dentro de una lista
+def cmpVideosByLikes(llave1, llave2):
+
+    valor= None
+    if llave1 > llave2:
+        valor= True
+    
+    else:
+        valor= False
+
+    return valor
 
 # Funciones de ordenamiento
+def insertionSort(sublista, cmpfunction):
+    
+    ia.sort(sublista, cmpfunction)
+
+def selectionSort(sublista, cmpfunction):
+
+    sa.sort(sublista, cmpfunction)
+
+def shellSort(sublista, cmpfunction):
+
+    sha.sort(sublista, cmpfunction)
+
+def quickSort(sublista, cmpfunction):
+
+    qk.sort(sublista, cmpfunction)
+
+def mergeSort(sublista, cmpfunction):
+
+    mg.sort(sublista, cmpfunction)
