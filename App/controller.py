@@ -23,6 +23,8 @@
 import config as cf
 import model
 import csv
+import time
+import tracemalloc
 
 
 """
@@ -36,10 +38,27 @@ def initCatalog():
 
 # Funciones para la carga de datos
 def loadData(catalog):
+
+    delta_time = -1.0
+    delta_memory = -1.0
+
+    tracemalloc.start()
+    start_time = getTime()
+    start_memory = getMemory()
+
     loadVideos(catalog)
 
+    stop_memory = getMemory()
+    stop_time = getTime()
+    tracemalloc.stop()
+
+    delta_time = stop_time - start_time
+    delta_memory = deltaMemory(start_memory, stop_memory)
+
+    return delta_time, delta_memory
+
 def loadVideos(catalog):
-    videosfile = cf.data_dir + 'video-samples/samples/videos-large.csv'
+    videosfile = cf.data_dir + 'video-samples/samples/videos-small.csv'
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
     for video in input_file:
         model.addVideo(catalog, video)
@@ -49,3 +68,26 @@ def loadVideos(catalog):
 def reqLab(catalog, categoría, num):
 
    return model.reqLab(catalog, categoría, num)
+
+#Funciones para medir tiempo y memoria
+
+def getTime():
+    
+    return float(time.perf_counter()*1000)
+
+def getMemory():
+
+    return tracemalloc.take_snapshot()
+
+def deltaMemory(start_memory, stop_memory):
+
+    memory_diff = stop_memory.compare_to(start_memory, "filename")
+    delta_memory = 0.0
+    
+    for stat in memory_diff:
+
+        delta_memory = delta_memory + stat.size_diff
+
+    delta_memory = delta_memory/1024.0
+
+    return delta_memory

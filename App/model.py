@@ -89,36 +89,36 @@ def newCatalog ():
     """
     Este indice crea un map cuya llave es el identificador del libro
     """
-    catalog['video_id'] = mp.newMap(92817,
-                                   maptype='CHAINING',
-                                   loadfactor=4.0)
+    catalog['video_id'] = mp.newMap(232073,
+                                   maptype='PROBING',
+                                   loadfactor=0.8)
 
-    catalog['trending_date'] = mp.newMap(1095,
-                                   maptype='CHAINING',
-                                   loadfactor=4.0)
+    catalog['trending_date'] = mp.newMap(5477,
+                                   maptype='PROBING',
+                                   loadfactor=0.8)
 
-    catalog['category_id'] = mp.newMap(16,
-                                 maptype='CHAINING',
-                                 loadfactor=2.0)
-
-    catalog['tags'] = mp.newMap(92817,
-                                 maptype='CHAINING',
-                                 loadfactor=4.0)
-
-    catalog['views'] = mp.newMap(92817,
-                                 maptype='CHAINING',
-                                 loadfactor=4.0)
-
-    catalog['likes'] = mp.newMap(92817,
-                                 maptype='CHAINING',
-                                 loadfactor=4.0)
-
-    catalog['country'] = mp.newMap(50,
-                                 maptype='CHAINING',
-                                 loadfactor=4.0)
-    catalog['categories'] = mp.newMap(32, 
+    catalog['category_id'] = mp.newMap(23,
                                  maptype='PROBING',
-                                 loadfactor=0.5)
+                                 loadfactor=0.8)
+
+    catalog['tags'] = mp.newMap(232073,
+                                 maptype='PROBING',
+                                 loadfactor=0.8)
+
+    catalog['views'] = mp.newMap(232073,
+                                 maptype='PROBING',
+                                 loadfactor=0.8)
+
+    catalog['likes'] = mp.newMap(232073,
+                                 maptype='PROBING',
+                                 loadfactor=0.8)
+
+    catalog['country'] = mp.newMap(251,
+                                 maptype='PROBING',
+                                 loadfactor=0.8)
+    catalog['categories'] = mp.newMap(23, 
+                                 maptype='PROBING',
+                                 loadfactor=0.8)
 
     return catalog
 # Funciones para agregar informacion al catalogo

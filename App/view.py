@@ -44,7 +44,7 @@ def initCatalog():
 
 def loadData(catalog):
 
-    controller.loadData(catalog)
+    return controller.loadData(catalog)
 
 def reqLab(catalog, categoría, num):
 
@@ -61,7 +61,9 @@ while True:
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
-        loadData(catalog)
+        answer = loadData(catalog)
+
+        print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ", "Memoria [kB]: ", f"{answer[1]:.3f}")
 
     elif int(inputs[0]) == 2:
         categoria= input("Ingrese la categoría que desea consultar-> ")  
