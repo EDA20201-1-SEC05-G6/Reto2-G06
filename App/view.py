@@ -36,7 +36,11 @@ operación solicitada
 def printMenu():
     print("Bienvenido")
     print("1- Cargar información en el catálogo")
-    print("2- Buscar los n videos con más likes para el nombre de una categoría específica")
+    print("2- Consultar videos con mas views en un país correspondientes a una categoría")
+    print("3- Consultar el video que más días estuvo trending en un país")
+    print("4- Consultar el video que más días estuvo trending en una categoría")
+    print("5- Consultar los videos con un tag especifico que tienen más likes")
+    print("0- Salir")
 
 def initCatalog():
 
@@ -46,9 +50,13 @@ def loadData(catalog):
 
     return controller.loadData(catalog)
 
-def reqLab(catalog, categoría, num):
+def consultar_id(dic, categoria):
 
-    return controller.reqLab(catalog, categoría, num)
+    return controller.consultar_id(dic, categoria)
+
+def filtrar_req1(pais, id, dic, videos, sublista):
+
+    return controller.filtrar_req1(pais, id, dic, videos, sublista)
 
 catalog = None
 
@@ -58,6 +66,7 @@ Menu principal
 while True:
     printMenu()
     inputs = input('Seleccione una opción para continuar\n')
+
     if int(inputs[0]) == 1:
         print("Cargando información de los archivos ....")
         catalog = initCatalog()
@@ -65,19 +74,35 @@ while True:
 
         print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ", "Memoria [kB]: ", f"{answer[1]:.3f}")
 
-    elif int(inputs[0]) == 2:
-        categoria= input("Ingrese la categoría que desea consultar-> ")  
-        num = int(input("Ingrese el numero de videos que desea consultar-> "))
-        videos = reqLab(catalog, categoria, num)
-        n= 1
-        for video in lt.iterator(videos):
-            print("\nVideo " + str(n))
-            print(video["title"])
-            print("Country: " + video["country"])
-            print("Views: " + video["views"])
-            print("Likes: " + video["likes"])
 
-            n+= 1
+    elif int(inputs[0]) == 2:
+
+       sublista = lt.newList(datastructure="ARRAY_LIST")
+
+       num_videos = int (input("Ingrese el número de videos que quiere que se presenten en su ranking-> "))
+       if num_videos > lt.size(catalog["videos"]): print("El número ingresado excede el número total de videos")
+        
+       else:
+           
+           categoria = input ("Ingrese la categoría que quiere consultar-> ")
+           id = consultar_id(catalog["categories"], categoria)
+           
+           pais = input("Ingrese el país que quiere consultar-> ")
+           filtrar_req1(pais, id, catalog["country"], catalog["videos"], sublista)
+
+           for pos in range(1, num_videos + 1):
+
+               elemento = lt.getElement(sublista, pos)
+
+               print("\n\nvideo " + str(pos))
+               print("trending date: " + str(elemento["trending_date"]))
+               print("title: " + elemento["title"])
+               print("channel title: " + elemento["channel_title"])
+               print("publish time: " + str (elemento["publish_time"]))
+               print("views: " + str(elemento["views"]))
+               print("likes: " + str(elemento["likes"]))
+               print("dislikes: " + str(elemento["dislikes"]))
+          
             
 
     else:

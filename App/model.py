@@ -37,6 +37,7 @@ from DISClib.Algorithms.Sorting import insertionsort as ia
 from DISClib.Algorithms.Sorting import selectionsort as sa
 from DISClib.Algorithms.Sorting import quicksort as qk
 from DISClib.Algorithms.Sorting import mergesort as mg
+from datetime import datetime
 
 """
 Se define la estructura de un catálogo de videos. El catálogo tendrá dos listas, una para los videos, otra para las categorias de
@@ -59,15 +60,7 @@ def newCatalog ():
     Retorna el catalogo inicializado.
     """
     catalog = {'videos': None,
-               'video_id': None,
-               'trending_date': None,
-               'title': None,
-               'channel_title': None,
                'category_id': None,
-               'publish_time': None,
-               'tags': None,
-               'views': None,
-               'likes': None,
                'country': None,
                "categories": None}
 
@@ -77,7 +70,7 @@ def newCatalog ():
     ordenados por ningun criterio.  Son referenciados
     por los indices creados a continuacion.
     """
-    catalog['videos'] = lt.newList(datastructure='SINGLE_LINKED')
+    catalog['videos'] = lt.newList(datastructure='ARRAY_LIST')
 
     """
     A continuacion se crean indices por diferentes criterios
@@ -89,33 +82,15 @@ def newCatalog ():
     """
     Este indice crea un map cuya llave es el identificador del libro
     """
-    catalog['video_id'] = mp.newMap(30941,
-                                   maptype='CHAINING',
-                                   loadfactor=6.0)
-
-    catalog['trending_date'] = mp.newMap(733,
-                                   maptype='CHAINING',
-                                   loadfactor=6.0)
 
     catalog['category_id'] = mp.newMap(3,
-                                 maptype='CHAINING',
-                                 loadfactor=6.0)
-
-    catalog['tags'] = mp.newMap(30941,
-                                 maptype='CHAINING',
-                                 loadfactor=6.0)
-
-    catalog['views'] = mp.newMap(30941,
-                                 maptype='CHAINING',
-                                 loadfactor=6.0)
-
-    catalog['likes'] = mp.newMap(30941,
                                  maptype='CHAINING',
                                  loadfactor=6.0)
 
     catalog['country'] = mp.newMap(37,
                                  maptype='CHAINING',
                                  loadfactor=6.0)
+
     catalog['categories'] = mp.newMap(3, 
                                  maptype='CHAINING',
                                  loadfactor=6.0)
@@ -123,14 +98,25 @@ def newCatalog ():
     return catalog
 # Funciones para agregar informacion al catalogo
 def addVideo (catalog, video):
-    lt.addLast(catalog["videos"], video)
-    addCategoryID(catalog, video)
-    addCountry(catalog, video)
-    addLikes(catalog, video)
-    addTags(catalog, video)
-    addTrendingDate(catalog, video)
-    addViews(catalog, video)
-    crearDicCategoryId(catalog)
+    dic = {}
+    dic ["video_id"] = video ["video_id"]
+    dic ["trending_date"] = datetime.strptime (video ["trending_date"], "%y.%d.%m").date ()
+    dic ["title"] = video ["title"]
+    dic ["channel_title"] = video ["channel_title"]
+    dic ["category_id"] = int (video ["category_id"])
+    dic ["publish_time"] = datetime.strptime (video ["publish_time"], "%Y-%m-%dT%H:%M:%S.%fZ")
+    dic ["tags"] = video ["tags"]
+    dic ["views"] = int (video ["views"])
+    dic ["likes"] = int (video ["likes"])
+    dic ["dislikes"] = int (video ["dislikes"])
+    dic ["country"] = video ["country"]
+    lt.addLast(catalog["videos"], dic)
+
+    pos = lt.size(catalog["videos"])
+
+    addCategoryID(catalog, video, pos)
+    addCountry(catalog, video, pos)
+
 
 def crearDicCategoryId (catalog):
     dic = catalog["categories"]
@@ -144,135 +130,98 @@ def crearDicCategoryId (catalog):
         if not presencia: 
             mp.put(dic, llave, int(lista [0]))
 
-
-def addTrendingDate (catalog, video):
-    dic = catalog["trending_date"]
-    presencia = mp.contains(dic, video["trending_date"])
-    if presencia:
-        entry = mp.get(dic, video["trending_date"])
-        lista = me.getValue(entry)
-        lt.addLast(lista, video) 
-    else:
-        mp.put(dic, video["trending_date"], lt.newList(datastructure="SINGLE_LINKED"))
-        entry = mp.get(dic, video["trending_date"])
-        lista = me.getValue(entry)
-        lt.addLast(lista, video)
-
-def addCategoryID(catalog, video):
+def addCategoryID(catalog, video, pos):
     dic = catalog["category_id"]
     presencia = mp.contains(dic, video["category_id"])
     if presencia:
         entry = mp.get(dic, video["category_id"])
         lista = me.getValue(entry)
-        lt.addLast(lista, video) 
+        lt.addLast(lista, pos) 
     else:
         mp.put(dic, video["category_id"], lt.newList(datastructure="SINGLE_LINKED"))
         entry = mp.get(dic, video["category_id"])
         lista = me.getValue(entry)
-        lt.addLast(lista, video)
+        lt.addLast(lista, pos)
 
-def addTags (catalog, video):
-    dic = catalog["tags"]
-    lista = video["tags"].split("|")
-
-    for tag in lista:
-        presencia = mp.contains(dic, tag)
-
-        if presencia:
-            entry = mp.get(dic, tag)
-            lista = me.getValue(entry)
-            lt.addLast(lista, video)   
-        else:
-            mp.put(dic, tag, lt.newList(datastructure="SINGLE_LINKED"))
-            entry = mp.get(dic, tag)
-            lista = me.getValue(entry)
-            lt.addLast(lista, video)
-
-def addViews (catalog, video):
-    dic = catalog["views"]
-    presencia = mp.contains(dic, int (video["views"]))
-
-    if presencia:
-        entry = mp.get(dic, int (video["views"]))
-        lista = me.getValue(entry)
-        lt.addLast(lista, video)  
-    else:
-        mp.put(dic, int (video["views"]), lt.newList(datastructure="SINGLE_LINKED"))
-        entry = mp.get(dic, int (video["views"]))
-        lista = me.getValue(entry)
-        lt.addLast(lista, video)
-
-def addLikes (catalog, video):
-    dic = catalog["likes"]
-    presencia = mp.contains(dic, int (video["likes"]))
-
-    if presencia:
-        entry = mp.get(dic, int (video["likes"]))
-        lista = me.getValue(entry)
-        lt.addLast(lista, video)  
-    else:
-        mp.put(dic, int (video["likes"]), lt.newList(datastructure="SINGLE_LINKED"))
-        entry = mp.get(dic, int (video["likes"]))
-        lista = me.getValue(entry)
-        lt.addLast(lista, video)
-
-def addCountry (catalog, video):
+def addCountry (catalog, video, pos):
     dic = catalog["country"]
     presencia = mp.contains(dic, video["country"])
 
     if presencia:
         entry = mp.get(dic, video["country"])
         lista = me.getValue(entry)
-        lt.addLast(lista, video)  
+        lt.addLast(lista, pos)  
     else:
         mp.put(dic, video["country"], lt.newList(datastructure="SINGLE_LINKED"))
         entry = mp.get(dic, video["country"])
         lista = me.getValue(entry)
-        lt.addLast(lista, video)
+        lt.addLast(lista, pos)
 
 # Funciones para creacion de datos
 
-# Funciones de consulta
-def reqLab (catalog, categoría, num):
-    videoLikes = catalog["likes"]
-    categorias = catalog["categories"]
-    entry = mp.get(categorias, categoría)
-    categoryid = me.getValue(entry)
-    llaves = mp.keySet(videoLikes)
-    lista = lt.newList(datastructure="ARRAY_LIST")
-    
-    for llave in lt.iterator(llaves):
-        lt.addLast(lista, llave)
+# Funciones de consulta  
 
-    quickSort(lista, cmpVideosByLikes)
-    videos = lt.newList(datastructure="ARRAY_LIST")
-    n = 0
+def consultar_id(dic, categoria):
 
-    for llave in lt.iterator(lista):
+    entry = mp.get(dic, categoria)
+    categoryID = me.getValue(entry)
 
-        entry = mp.get(videoLikes, llave)
-        elemento = me.getValue(entry)
+    return categoryID
 
-        for video in lt.iterator(elemento):
-            if int(video["category_id"]) == categoryid:
+def filtrar_req1(pais, id, dic, videos, sublista):
 
-                lt.addLast(videos, video)
-                n+= 1
+    entry = mp.get(dic, pais)
+    lista = me.getValue(entry)
 
-            if n >= num: 
-                return videos
+    for pos in lt.iterator(lista):
 
-    
-             
-
+        video = lt.getElement(videos, pos)
         
+        if video["category_id"] == id:
 
+            lt.addLast(sublista, video)
+
+    quickSort(sublista, cmpVideosByViewsMayor)
 
 # Funciones utilizadas para comparar elementos dentro de una lista
-def cmpVideosByLikes(llave1, llave2):
+
+def cmpVideosByViews(video1, video2):
 
     valor= None
-    if llave1 > llave2:
+    if video1["views"] < video2["views"]:
+        valor= True
+    
+    else:
+        valor= False
+
+    return valor
+
+def cmpVideosByViewsMayor(video1, video2):
+
+    valor= None
+    if video1["views"] > video2["views"]:
+        valor= True
+    
+    else:
+        valor= False
+
+    return valor
+
+def cmpVideosByID(video1, video2):
+
+    valor= None
+    if video1["video_id"] > video2["video_id"]:
+        valor= True
+    
+    else:
+        valor= False
+
+    return valor
+
+def cmpVideosByLikes(video1, video2):
+
+    valor= None
+    if video1["likes"] > video2["likes"]:
         valor= True
     
     else:

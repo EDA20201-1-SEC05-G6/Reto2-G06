@@ -45,7 +45,8 @@ def loadData(catalog):
     tracemalloc.start()
     start_time = getTime()
     start_memory = getMemory()
-
+    
+    model.crearDicCategoryId(catalog)
     loadVideos(catalog)
 
     stop_memory = getMemory()
@@ -58,16 +59,24 @@ def loadData(catalog):
     return delta_time, delta_memory
 
 def loadVideos(catalog):
-    videosfile = cf.data_dir + 'video-samples/samples/videos-50pct.csv'
+    videosfile = cf.data_dir + 'video-samples/samples/videos-large.csv'
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
+
     for video in input_file:
         model.addVideo(catalog, video)
+
 # Funciones de ordenamiento
 
 # Funciones de consulta sobre el catálogo
-def reqLab(catalog, categoría, num):
 
-   return model.reqLab(catalog, categoría, num)
+def consultar_id(dic, categoria):
+
+    return model.consultar_id(dic, categoria)
+
+def filtrar_req1(pais, id, dic, videos, sublista):
+
+    return model.filtrar_req1(pais, id, dic, videos, sublista)
+
 
 #Funciones para medir tiempo y memoria
 
