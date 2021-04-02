@@ -58,6 +58,9 @@ def filtrar_req1(pais, id, dic, videos, sublista):
 
     return controller.filtrar_req1(pais, id, dic, videos, sublista)
 
+def filtrar_req2(pais, videos, dic, sublista):
+
+    return controller.filtrar_req2(pais, videos, dic, sublista)
 catalog = None
 
 """
@@ -102,8 +105,19 @@ while True:
                print("views: " + str(elemento["views"]))
                print("likes: " + str(elemento["likes"]))
                print("dislikes: " + str(elemento["dislikes"]))
-          
-            
+        
+    elif int(inputs[0]) == 3:
+        sublista = lt.newList(datastructure="ARRAY_LIST")
+
+        pais = input("Ingrese el país que desea consultar-> ")
+        video = filtrar_req2(pais, catalog["videos"], catalog["country"], sublista)
+
+        print("\n\ntitle: " + str(video[0][0]))
+        print("channel title: " + str(video[0][0]))
+        print("country: " + str(video[0][2]))
+        print("trending days: " + str(video[1]))
+
+
 
     else:
         sys.exit(0)
