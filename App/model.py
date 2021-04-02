@@ -83,17 +83,17 @@ def newCatalog ():
     Este indice crea un map cuya llave es el identificador del libro
     """
 
-    catalog['category_id'] = mp.newMap(3,
-                                 maptype='CHAINING',
-                                 loadfactor=6.0)
+    catalog['category_id'] = mp.newMap(57,
+                                 maptype='PROBING',
+                                 loadfactor=0.3)
 
-    catalog['country'] = mp.newMap(37,
-                                 maptype='CHAINING',
-                                 loadfactor=6.0)
+    catalog['country'] = mp.newMap(673,
+                                 maptype='PROBING',
+                                 loadfactor=0.3)
 
-    catalog['categories'] = mp.newMap(3, 
-                                 maptype='CHAINING',
-                                 loadfactor=6.0)
+    catalog['categories'] = mp.newMap(57, 
+                                 maptype='PROBING',
+                                 loadfactor=0.3)
 
     return catalog
 # Funciones para agregar informacion al catalogo
