@@ -59,7 +59,7 @@ def loadData(catalog):
     return delta_time, delta_memory
 
 def loadVideos(catalog):
-    videosfile = cf.data_dir + 'video-samples/samples/videos-small.csv'
+    videosfile = cf.data_dir + 'video-samples/samples/videos-large.csv'
     input_file = csv.DictReader(open(videosfile, encoding='utf-8'))
 
     for video in input_file:
@@ -80,6 +80,15 @@ def filtrar_req1(pais, id, dic, videos, sublista):
 def filtrar_req2(pais,videos, dic, sublista):
 
     return model.filtrar_req2(pais, videos, dic, sublista)
+
+def filtrar_req3(id, videos, dic, sublista):
+
+    return model.filtrar_req3(id, videos, dic, sublista)
+
+def filtrar_req4(dic, sublista, tag, videos, pais):
+
+    return model.filtrar_req4(dic, sublista, tag, videos, pais)
+
 #Funciones para medir tiempo y memoria
 
 def getTime():

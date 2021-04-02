@@ -61,6 +61,15 @@ def filtrar_req1(pais, id, dic, videos, sublista):
 def filtrar_req2(pais, videos, dic, sublista):
 
     return controller.filtrar_req2(pais, videos, dic, sublista)
+
+def filtrar_req3(id, videos, dic, sublista):
+
+    return controller.filtrar_req3(id, videos, dic, sublista)
+
+def filtrar_req4(dic, sublista, tag, videos, pais):
+
+    return controller.filtrar_req4(dic, sublista, tag, videos, pais)
+
 catalog = None
 
 """
@@ -113,10 +122,50 @@ while True:
         video = filtrar_req2(pais, catalog["videos"], catalog["country"], sublista)
 
         print("\n\ntitle: " + str(video[0][0]))
-        print("channel title: " + str(video[0][0]))
+        print("channel title: " + str(video[0][1]))
         print("country: " + str(video[0][2]))
         print("trending days: " + str(video[1]))
 
+    elif int(inputs[0]) == 4:
+        sublista = lt.newList(datastructure="ARRAY_LIST")
+
+        categoria = input("Ingrese la categoría que desea consultar-> ")
+        categoryID = consultar_id(catalog["categories"], categoria)
+
+        video = filtrar_req3(categoryID, catalog["videos"], catalog["category_id"], sublista)
+
+        print("\n\ntitle: " + str(video[0][0]))
+        print("channel title: " + str(video[0][1]))
+        print("country: " + str(video[0][2]))
+        print("trending days: " + str(video[1]))
+
+    elif int(inputs[0]) == 5:
+
+        sublista = lt.newList(datastructure="ARRAY_LIST")
+
+        num_videos = int(input("Ingrese el numero de videos que desea consultar-> "))
+        pais = input("Ingrese el país que desea consultar-> ")
+        tag = input("Ingrese el tag que desea consultar-> ")
+
+        filtrar_req4(catalog["country"], sublista, tag, catalog["videos"], pais)
+
+        impresos = lt.newList(datastructure="ARRAY_LIST")
+        pos = 1
+        num = 1
+        while num in range (1, num_videos + 1) and pos in range (1, lt.size(sublista) + 1):
+            elemento = lt.getElement(sublista, pos)
+            if lt.isPresent(impresos, elemento["title"]) == 0:
+                print("\n\nvideo " + str(num))
+                print("title: " + elemento["title"])
+                print("channel title: " + elemento["channel_title"])
+                print("publish time: " + str (elemento["publish_time"]))
+                print("views: " + str(elemento["views"]))
+                print("likes: " + str(elemento["likes"]))
+                print("dislikes: " + str(elemento["dislikes"]))
+                print("tags: " + elemento["tags"])
+                lt.addLast(impresos, elemento["title"])
+                num += 1
+            pos += 1
 
 
     else:

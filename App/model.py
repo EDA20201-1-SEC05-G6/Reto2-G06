@@ -132,14 +132,15 @@ def crearDicCategoryId (catalog):
 
 def addCategoryID(catalog, video, pos):
     dic = catalog["category_id"]
-    presencia = mp.contains(dic, video["category_id"])
+    presencia = mp.contains(dic, int(video["category_id"]))
     if presencia:
-        entry = mp.get(dic, video["category_id"])
+        entry = mp.get(dic, int(video["category_id"]))
         lista = me.getValue(entry)
         lt.addLast(lista, pos) 
     else:
-        mp.put(dic, video["category_id"], lt.newList(datastructure="SINGLE_LINKED"))
-        entry = mp.get(dic, video["category_id"])
+        categoryID = int(video["category_id"])
+        mp.put(dic, categoryID, lt.newList(datastructure="SINGLE_LINKED"))
+        entry = mp.get(dic, categoryID)
         lista = me.getValue(entry)
         lt.addLast(lista, pos)
 
@@ -222,6 +223,61 @@ def filtrar_req2(pais, videos, dic, sublista):
             diastrending += 1
 
     return (videoMastrending, masDiastrending)
+
+def filtrar_req3(id, videos, dic, sublista):
+
+    entry = mp.get(dic, id)
+    lista = me.getValue(entry)
+
+    for pos in lt.iterator(lista):
+        video = lt.getElement(videos, pos)
+        lt.addLast(sublista, video)
+
+    quickSort(sublista, cmpVideosByID)
+
+    fechas= lt.newList(datastructure="ARRAY_LIST")
+    id= None
+    masDiastrending = 0
+    diastrending = 0
+    video = None
+    videoMastrending = None
+
+    for pos in range(1, lt.size(sublista) + 1):
+        elemento = lt.getElement(sublista, pos)
+
+        if id != elemento["video_id"]:
+
+            if diastrending > masDiastrending:
+                videoMastrending = video
+                masDiastrending = diastrending
+    
+            video = (elemento["title"], elemento["channel_title"], elemento["country"])
+            id = elemento["video_id"]
+            fechas = lt.newList(datastructure="ARRAY_LIST")
+            lt.addLast(fechas, elemento["trending_date"])
+            diastrending = 1 
+
+        elif lt.isPresent(fechas, elemento["trending_date"]) == 0:
+
+            lt.addLast(fechas, elemento["trending_date"])
+            diastrending += 1
+
+    return (videoMastrending, masDiastrending)
+
+def filtrar_req4(dic, sublista, tag, videos, pais):
+    
+    entry = mp.get(dic, pais)
+    lista = me.getValue(entry)
+
+    for pos in lt.iterator(lista):
+
+        video = lt.getElement(videos, pos)
+        
+        if tag in video["tags"]:
+
+            lt.addLast(sublista, video)
+
+    quickSort(sublista, cmpVideosByLikes)
 
 # Funciones utilizadas para comparar elementos dentro de una lista
 
