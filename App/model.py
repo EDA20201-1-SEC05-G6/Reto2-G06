@@ -233,7 +233,7 @@ def filtrar_req3(id, videos, dic, sublista):
         video = lt.getElement(videos, pos)
         lt.addLast(sublista, video)
 
-    quickSort(sublista, cmpVideosByID)
+    mergeSort(sublista, cmpVideosByID)
 
     fechas= lt.newList(datastructure="ARRAY_LIST")
     id= None

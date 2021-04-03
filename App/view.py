@@ -74,7 +74,7 @@ def filtrar_req4(dic, sublista, tag, videos, pais):
 
 def getTime():
     
-    return float(time.perf_counter()*1000)
+    return float(time.process_time()*1000)
 
 def getMemory():
 
@@ -116,21 +116,16 @@ while True:
 
        num_videos = int (input("Ingrese el número de videos que quiere que se presenten en su ranking-> "))
 
-       delta_time = -1.0
-       delta_memory = -1.0
-
-       tracemalloc.start()
-       start_time = getTime()
-       start_memory = getMemory()
-
        if num_videos > lt.size(catalog["videos"]): print("El número ingresado excede el número total de videos")
         
        else:
            
            categoria = input ("Ingrese la categoría que quiere consultar-> ")
-           id = consultar_id(catalog["categories"], categoria)
            
            pais = input("Ingrese el país que quiere consultar-> ")
+
+           id = consultar_id(catalog["categories"], categoria)
+
            filtrar_req1(pais, id, catalog["country"], catalog["videos"], sublista)
 
            for pos in range(1, num_videos + 1):
@@ -145,28 +140,12 @@ while True:
                print("views: " + str(elemento["views"]))
                print("likes: " + str(elemento["likes"]))
                print("dislikes: " + str(elemento["dislikes"]))
-        
-       stop_memory = getMemory()
-       stop_time = getTime()
-       tracemalloc.stop()
 
-       delta_time = stop_time - start_time
-       delta_memory = deltaMemory(start_memory, stop_memory)
-       answer = (delta_time, delta_memory)
-
-       print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ", "Memoria [kB]: ", f"{answer[1]:.3f}")
         
     elif int(inputs[0]) == 3:
         sublista = lt.newList(datastructure="ARRAY_LIST")
 
         pais = input("Ingrese el país que desea consultar-> ")
-
-        delta_time = -1.0
-        delta_memory = -1.0
-
-        tracemalloc.start()
-        start_time = getTime()
-        start_memory = getMemory()
 
         video = filtrar_req2(pais, catalog["videos"], catalog["country"], sublista)
 
@@ -175,28 +154,10 @@ while True:
         print("country: " + str(video[0][2]))
         print("trending days: " + str(video[1]))
 
-        stop_memory = getMemory()
-        stop_time = getTime()
-        tracemalloc.stop()
-
-        delta_time = stop_time - start_time
-        delta_memory = deltaMemory(start_memory, stop_memory)
-
-        answer = (delta_time, delta_memory)
-
-        print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ", "Memoria [kB]: ", f"{answer[1]:.3f}")
-
     elif int(inputs[0]) == 4:
         sublista = lt.newList(datastructure="ARRAY_LIST")
 
         categoria = input("Ingrese la categoría que desea consultar-> ")
-
-        delta_time = -1.0
-        delta_memory = -1.0
-
-        tracemalloc.start()
-        start_time = getTime()
-        start_memory = getMemory()
 
         categoryID = consultar_id(catalog["categories"], categoria)
 
@@ -207,17 +168,6 @@ while True:
         print("country: " + str(video[0][2]))
         print("trending days: " + str(video[1]))
 
-        stop_memory = getMemory()
-        stop_time = getTime()
-        tracemalloc.stop()
-
-        delta_time = stop_time - start_time
-        delta_memory = deltaMemory(start_memory, stop_memory)
-
-        answer = (delta_time, delta_memory)
-
-        print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ", "Memoria [kB]: ", f"{answer[1]:.3f}")
-
     elif int(inputs[0]) == 5:
 
         sublista = lt.newList(datastructure="ARRAY_LIST")
@@ -225,13 +175,6 @@ while True:
         num_videos = int(input("Ingrese el numero de videos que desea consultar-> "))
         pais = input("Ingrese el país que desea consultar-> ")
         tag = input("Ingrese el tag que desea consultar-> ")
-
-        delta_time = -1.0
-        delta_memory = -1.0
-
-        tracemalloc.start()
-        start_time = getTime()
-        start_memory = getMemory()
 
         filtrar_req4(catalog["country"], sublista, tag, catalog["videos"], pais)
 
@@ -252,17 +195,6 @@ while True:
                 lt.addLast(impresos, elemento["title"])
                 num += 1
             pos += 1
-
-        stop_memory = getMemory()
-        stop_time = getTime()
-        tracemalloc.stop()
-
-        delta_time = stop_time - start_time
-        delta_memory = deltaMemory(start_memory, stop_memory)
-
-        answer = (delta_time, delta_memory)
-
-        print("Tiempo [ms]: ", f"{answer[0]:.3f}", "  ||  ", "Memoria [kB]: ", f"{answer[1]:.3f}")
 
 
     else:
